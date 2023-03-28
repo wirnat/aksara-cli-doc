@@ -4,10 +4,10 @@
 <meta charset="UTF-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no">
-<link href="assets/images/favicon.png" rel="icon" />
-<title>Aksara CLI Documentation</title>
-<meta name="description" content="Your ThemeForest item Name and description">
-<meta name="author" content="harnishdesign.net">
+<!-- <link href="assets/images/favicon.png" rel="icon" /> -->
+<title>Axara Documentation</title>
+<meta name="description" content="Smart Code Generator">
+<meta name="author" content="https://wirnat.github.io/letter-from-wira/">
 
 <!-- Stylesheet
 ============================== -->
@@ -50,8 +50,8 @@
 		<button id="sidebarCollapse" class="navbar-toggler d-block d-md-none" type="button"><span></span><span class="w-75"></span><span class="w-50"></span></button>
 		
 		<!-- Logo --> 
-        <a class="logotxt ml-md-3" href="index.html" title="iDocs Template"><h4 class="logotxt">Aksara-CLI</h4> </a> 
-		<span class="text-2 ml-2">v0.0.3</span> 
+    <a class="logotxt ml-md-3" href="index.html" title="iDocs Template"><h4 class="logotxt">Axara</h4> </a> 
+		<span class="text-2 ml-2">v1.1.0</span> 
         <!-- Logo End -->
         
 		<!-- Navbar Toggler -->
@@ -128,24 +128,24 @@
 		============================ -->
         <section id="idocs_start">
         <h1>Documentation</h1>
-        <h2>Aksara CLI</h2>
+        <h2>Axara CLI</h2>
         <p class="lead">Speed Up your coding process with Smart Code Generator.</p>
 		<hr>
 		<div class="row">
 			<div class="col-sm-6 col-lg-4">
 				<ul class="list-unstyled">
-					<li><strong>Doc for Version:</strong> 0.0.3</li>
+					<li><strong>Doc for Version:</strong> 1.1.0</li>
 					<li><strong>Author:</strong> <a href="https://wirnat.github.io/letter-from-wira/" target="_blank">Wirnat</a></li>
 				</ul>
 			</div>
 			<div class="col-sm-6 col-lg-4">
 				<ul class="list-unstyled">
 					<li><strong class="font-weight-700">Created:</strong> 9 October, 2022</li>
-					<li><strong>Last Updated:</strong> 12 October, 2022</li>
+					<li><strong>Last Updated:</strong> 24 Maret, 2023</li>
 				</ul>
 			</div>
     <div class="col-sm-12">
-      <p>Aksara CLI is code generator that used to build repeatable code depend on the model. For example, If you work using architecture layer this tool will useful to help build your CRUD(create update delete) on repository, delivery, or usecase layer, even mocking an service. So you can just focus to the business logic on the project. <br>
+      <p>Axara CLI is code generator that used to build repeatable code depend on the Model and Template. For example, If you work using architecture layer this tool will useful to help build your CRUD(create update delete) on repository, delivery, or usecase layer, even mocking an service or swagger documentation. So you can just focus to the business logic on the project. <br>
     </div>
 		<!-- </div>
         <p class="alert alert-info">If you have any questions that are beyond the scope of this help file, Please feel free to email via <a target="_blank" href="https://themeforest.net/user/harnishdesign/#contact?ref=HarnishDesign">Item Support Page</a>.</p>
@@ -157,7 +157,7 @@
 		============================ -->
         <div id="idocs_installation" class="col-lg-12 col-md-12">
           <h2>Installation</h2>
-         <pre><code class="html">go install github.com/wirnat/aksara-cli@v0.0.3 </code> </pre>
+         <pre><code class="html">go install github.com/wirnat/axara@latest </code> </pre>
         </div>
         
 		<hr class="divider">
@@ -166,40 +166,43 @@
 		============================ -->
         <div id="idocs_quick_example" class="col-lg-12 col-md-12">
           <h2>Quick Example</h2>
-          <p>Let's practices with a simple case, assume we want to create a CRUD for modules <i>company and branch</i>, but only in repository layer.</p>
+          <p>Let's practices with a simple case, assume we want to create a CRUD for modules <i>company and customer</i>, but only in repository layer.</p>
           <p>First, prepare the models in <b>model</b> directory:</p>
+          model/company.go
           <pre>
             <code>
 package model
 
-type Branch struct {
+type Company struct {
   BaseModel
-  CompanyID   int64   `json:"company_id"`
-  Name        string  `json:"name"`
-  Description *string `json:"description"`
+  Name string `json:"name"` //@meta validate:true
 }
 
-/*
-  @model Branch
-  @service branch
-*/
+//@Register Company
+              
             </code>
-       
+          </pre>
+          model/customer.go
+            <pre>
           <code>
 package model
 
-type Company struct {
-	BaseModel
-	Name string `json:"name"`
+import "time"
+
+type Customer struct {
+  BaseModel
+  Name      string     `json:"name"` //@meta validate:true
+  BirthDate *time.Time `json:"birth_date"`
+  Email     string     `json:"email"` //@meta validate:true
+  Phone     string     `json:"phone"` //@meta validate:true
 }
 
-/*
-	@model Company
-	@service company
-*/
+//@Register Customer            
+</code>
+</pre>
+model/base_model.go
 
-          </code>
-
+    <pre>
             <code>
 package model
 
@@ -211,42 +214,49 @@ type BaseModel struct {
 	ID        int64      `json:"id"`
 	UUID      string     `json:"uuid"`
 	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at"`
+	UpdatedAt time.Time  `json:"updated_at"` //~ignore
+	DeletedAt *time.Time `json:"deleted_at"` //~ignore
 }
 
             </code>
           </pre>
-          <p>Model work as backbone in this generator, if @model comment is found in model, it will execute the model to the generator.</p>
+          <p>Model work as backbone in this generator, if @Register comment is found in model, it will execute the model to the generator.</p>
           <hr>
-          <p>Then, create a json file with the name <b>simple_crud.json</b></p>
-          <p class="alert alert-info">You can use other name of json file if you want.</p>
+          <p>Then, create a config yaml file <b>simple_crud.yaml</b></p>
+          <p class="alert alert-info">You can use other name of config file if you want.</p>
           <pre>
             <code class="html">
-              {
-                "key": "ᬅᬓ᭄ᬱᬭ",
-                "model_path": "model",
-                "result_path": "modules",
-                "module_name": "github.com/wirnat/aksara-cli",
-                "module_traits": [
-                  {
-                    "name": "~service~ repository interfaces",
-                    "dir": "~result_path~/~service~/~service~_repository",
-                    "template": "template/clean_architecture/repository_interfaces.text",
-                    "file_name": "~service~.go",
-                    "meta": {
-                      "import_request": "~module_name~/~result_path~/~service~/~service~_request"
-                    }
-                  },
-                  {
-                    "name": "~service~ fetch param",
-                    "dir": "~result_path~/~service~/~service~_request",
-                    "template": "template/clean_architecture/request_param.text",
-                    "file_name": "~service~_request.go",
-                    "meta": {}
-                  },
-                ]
-              }
+key: ᬅᬓ᭄ᬱᬭ
+model_path: model
+module_name: gox
+models:
+  Customer:
+    module: customer
+  Company:
+    module: company
+
+meta:
+  result_path: modules
+  repository_dir: ~result_path~/~module~/repository
+  repository_gorm_dir: ~result_path~/~module~/repository/gorm_repository
+  template: templates
+  import_model: ~module_name~/~model_path~
+  import_repository: ~module_name~/repository
+
+module_traits:
+  - name: "~model_snake~ repository"
+    dir: ~repository_dir~
+    template: ~template~/repository.text
+    file_name: "~model_snake~.g.go"
+    active: true
+
+  - name: "~model_snake~ repository gorm"
+    dir: ~repository_gorm_dir~
+    template: ~template~/repository_gorm.text
+    file_name: "~model_snake~_gorm.g.go"
+    active: true
+
+
             </code>
           </pre>
             This file will work as a configurator, generator and aggregator, so you must assign:
@@ -255,9 +265,11 @@ type BaseModel struct {
             <br>
             <b>model_path</b>, model directory 
             <br>
-            <b>result_path</b>, the location of result
-            <br>
             <b>module_name</b>, the name of your project in go mod
+            <br>
+            <b>meta</b>, reusable variable that can used and decoded in config file or template file
+            <br>
+            <b>models</b>, declare model which will execute, and you can declare dynamic meta per model. in this example we add meta with key module and dynamic value 
             <br>
               <b>module_traits</b> is a file generator, it will generate file base on the template which assign in <b>template</b>. 
             <br>
@@ -271,110 +283,117 @@ type BaseModel struct {
           </p>
          </p>
 
-          <p class="alert alert-info"> Module Trait will executed when the generator read the model that has @model meta</p>
+          <p class="alert alert-info"> Module Trait will executed when the generator read the model that has @Register [Model]</p>
         
-         <b> But, what is ~service~ , @model , @service, etc ?</b>
+         <b>But how to use/decode Meta ?</b>
           <p>
-            Aksara CLI has default meta and can called in generator json file or in template file.
+            Axara CLI has default meta and can called in generator config file or in template file, but you can also add meta in config file or you can add meta in models (dynamic meta)
           </p>
           <p>
-            Json key of the configurator is a default meta (except module_traits). In json file you can use <b>~meta name~</b> to make your config more dynamic and readable.
-            Inside the <b>module_traits</b>, we can use meta which declared in model file like <b>~service~</b>
+             In config file you can use <b>~meta name~</b> to make decode value to your config for more dynamic and readable.
             <br>
-            <br>
-           <center> <img width="300" src="assets/images/ss5.png" alt="">
-            <br>
-            <small>Declared meta on model</small></center>
             <br>
             <hr>
-            <p>Now let's create the template, at module_traits in json file we have declared 2 generate file, so we need create 2 template too.</p>
+            <p>Now let's create the template, at module_traits in config file we have declared 2 generate file, so we need create 2 template too.</p>
             <p>
-              Template for interface repository file:
+              Template for interface repository file, templates/repository.text :
               <pre>
                 <code>
-package {{.Meta.package_repo}}
+package repository
 
 import (
   "context"
-  "{{.ModuleName}}/{{.ModelPath}}"
+  "{{.Meta.import_model}}"
+  "time"
 )
 
-type {{.Model}}Repository interface {
-  {{.Model}}RepositoryStore
-  {{.Model}}RepositoryUpdate
-  {{.Model}}RepositoryGet
-  {{.Model}}RepositoryFetch
+type {{.Model}} interface {
+  Fetch(ctx context.Context, param Param) (res []model.{{.Model}}, err error)
+  Show(ctx context.Context, param Param) (res model.{{.Model}}, err error)
+  Update(ctx context.Context, param Param, update model.{{.Model}}) (err error)
+  Store(ctx context.Context, store model.{{.Model}}) (err error)
+  Delete(ctx context.Context, id int64) (err error)
 }
 
-type {{.Model}}RepositoryStore interface {
-  Store(ctx context.Context, branch *model.{{.Model}}) error
-}
-
-type {{.Model}}RepositoryUpdate interface {
-  Update(ctx context.Context, branch *model.{{.Model}}) error
-}
-
-type {{.Model}}RepositoryGet interface {
-  Get(ctx context.Context, uuid string) (model.{{.Model}}, error)
-}
-
-type {{.Model}}RepositoryFetch interface {
-  Fetch(ctx context.Context) ([]model.{{.Model}}, error)
-}
+type Param struct {
+  {{- range $m:=.ModelFields }}
+        {{$m.Name }} *{{$m.Type }} `json:"{{$m.Json -}}" form:"{{$m.Json }}" query:"{{$m.Json }}" {{if eq $m.Meta.validate "true"}}validate:"required"{{end}}`
+    {{- end}}
+}                  
                   
 
                 </code>
               </pre>
             </p>
             <p>
-              Template for repository implementation file:
+              Template for repository implementation file, templates/repository_gorm.text:
               <pre>
                 <code>
-package {{.Meta.package_gorm}}
+package gorm_repository
 
 import (
   "context"
-  "{{.ModuleName}}/{{.ModelPath}}"
   "gorm.io/gorm"
+  "{{.Meta.import_model}}"
+  "{{.Meta.import_repository}}"
 )
 
-type {{.Meta.service}}Gorm struct {
-  db gorm.DB
+type {{.ModelCamel}}Gorm struct {
+  gorm.DB
 }
 
-func New{{.Model}}Gorm(db gorm.DB) *{{.Meta.service}}Gorm {
-  return &{{.Meta.service}}Gorm{db: db}
+func New{{.Model}}Gorm(DB gorm.DB) *{{.ModelCamel}}Gorm {
+  return &{{.ModelCamel}}Gorm{DB: DB}
 }
 
-func (b {{.Meta.service}}Gorm) Store(ctx context.Context, {{.Meta.service}} *model.{{.Model}}) error {
-  return b.db.Create({{.Meta.service}}).Error
+func filter(db *gorm.DB, param repository.Param) {
+  {{- range $m:=.ModelFields }}
+      if param.{{$m.Name}} != nil {
+        *db = *db.Where("{{$m.Json}}=?", *param.{{$m.Name -}})
+        }
+        {{- end}}
 }
 
-func (b {{.Meta.service}}Gorm) Update(ctx context.Context, {{.Meta.service}} *model.{{.Model}}) error {
-  return b.db.Updates({{.Meta.service}}).Error
-}
-
-func (b {{.Meta.service}}Gorm) Get(ctx context.Context, uuid string) (r model.{{.Model}}, err error) {
-  err = b.db.Where("uuid=?", uuid).First(&r).Error
+func (r {{.ModelCamel}}Gorm) Fetch(ctx context.Context, param repository.Param) (res []model.{{.Model}}, err error) {
+  filter(&r.DB, param)
+  err = r.DB.Find(&res).Error
   return
 }
 
-func (b {{.Meta.service}}Gorm) Fetch(ctx context.Context) (r []model.{{.Model}}, err error) {
-  err = b.db.First(&r).Error
+func (r {{.ModelCamel}}Gorm) Show(ctx context.Context, param repository.Param) (res model.{{.Model}}, err error) {
+  filter(&r.DB, param)
+  err = r.DB.First(&res).Error
   return
 }
+
+func (r {{.ModelCamel}}Gorm) Update(ctx context.Context, param repository.Param, update model.{{.Model}}) (err error) {
+  filter(&r.DB, param)
+  err = r.DB.Updates(&update).Error
+  return
+}
+
+func (r {{.ModelCamel}}Gorm) Store(ctx context.Context, store model.{{.Model}}) (err error) {
+  err = r.DB.Create(&store).Error
+  return
+}
+
+func (r {{.ModelCamel}}Gorm) Delete(ctx context.Context, id int64) (err error) {
+  err = r.DB.Where("id=?", id).Delete(&model.{{.Model}}{}).Error
+  return
+}
+                  
 
                 </code>
               </pre>
-              Double curly bracket will call variable which declared by default in generator such as {{.Model}}, json file variable, or meta that's setted in model or json file.
+              Double curly bracket will call variable which declared by default in generator such as {{.Model}}, config file variable, or meta that's setted in config file.
             </p>
-             Execute the generator by following command,<code class="html">aksara-cli generate [your json file] </code>:
+             Execute the generator by following command,<code class="html">axara generate [your config file] --models [execute models]</code>:
             <br>
            <br>
            <br>
-            <pre><code class="html">aksara-cli generate simple_crud.json </code> </pre>
+            <pre><code class="html">axara generate simple_crud.yaml --models Customer,Company </code> </pre>
             <center>
-              <img src="assets/images/ss9.png" alt="" srcset="">
+              <img src="assets/images/ss10.png" alt="" srcset="">
               <br>
               <small>
                 The result is a complete set of folders with files formed by the template
@@ -389,24 +408,32 @@ func (b {{.Meta.service}}Gorm) Fetch(ctx context.Context) (r []model.{{.Model}},
         <section id="idocs_feature">
           <h2>How it's work?</h2>
           <p>
-            Aksara-cli works depend on template, model, and json file. On start process generator will read json file and scan the model directory to find model that has @model in model file, then module_traits in json file will execute template and, meta variable base on scanned model will run on this process.
+            Axara-cli works depend on template, model, and config file.
+            <br>
+            1. On start process generator will read config file.
+            <br>
+            2. Scan the model directory to find model that has @Register [model] in model file
+            <br>
+            3. Then module_traits in config file will execute template and, meta variable base on scanned model will decoded on this process.
           </p
         ></section>
 		<!-- Color Schemes
 		============================ -->
         <section id="idocs_meta">
           <h2>Meta</h2>
-          <p>Meta is a variable that used for json and template file. Meta can be set from model file or json file.
+          <p>Meta is a variable that used for config and template file. Meta can be set from model file or config file.
           </p>
           <b>Model Meta</b>
-         <p> To add meta from model, you can write comment in model file (any where in file) and add @ as a prefix of meta key followed by meta value</p>
+         <p> To add meta base on model, you can declare model and add key value of meta</p>
 
           <pre>
             <code>
-/*
-  @model Company
-  @model_snake_case company
-*/
+models:
+  Customer:
+    module: customer
+    anything: hello world!
+  Company:
+    module: company
             </code>
           </pre>
           <div class="alert alert-info">Consider if you want to use variable base on model (scanned model turn), add meta from model is the best choice</div>
@@ -423,32 +450,23 @@ func (b {{.Meta.service}}Gorm) Fetch(ctx context.Context) (r []model.{{.Model}},
     }
   </code>
 </pre>
-          <b>Json Meta</b>
-          <p> You also can add meta from json file, by adding meta in module_traits, but keep in your mind meta must be unique</p>
+          <b>Static Meta</b>
+          <p> You also can add meta from config file, by adding in meta, but keep in your mind meta must be unique</p>
            <pre>
              <code>
-{
-  "key": "ᬅᬓ᭄ᬱᬭ",
-  "model_path": "model",
-  "result_path": "modules",
-  "module_name": "github.com/wirnat/aksara-cli",
-  "module_traits": [
-    {
-      "name": "~service~ repository interfaces",
-      "dir": "~result_path~/~service~/~service~_repository",
-      "template": "template/clean_architecture/repository_interfaces.text",
-      "file_name": "~service~.go",
-      "meta": {
-        "app_name":"extraction" 
-      }
-    }
-  ]
-}
+meta:
+  result_path: modules
+  repository_dir: ~result_path~/~module~/repository
+  repository_gorm_dir: ~result_path~/~module~/repository/gorm_repository
+  template: templates
+  import_model: ~module_name~/~model_path~
+  import_repository: ~module_name~/repository
              </code>
            </pre>
            <b>Meta Usage</b>
-           <p>In json file you can call meta using <code>~[meta-name]~</code>, in template you can call meta using <code>{{.[meta-name]}}</code></p>
+           <p>In config file you can call meta using <code>~[meta-name]~</code>, in template you can call meta using <code>{{.[meta-name]}}</code></p>
           <b>Default Meta</b>
+          By Default, axara cli already generated meta for common use:
           <ul>
             <li><code>Model</code> - Name of scanned model</li>
             <li><code>ModelFields</code> - List of model fields, every field contains: <ul>
@@ -476,7 +494,7 @@ func (b {{.Meta.service}}Gorm) Fetch(ctx context.Context) (r []model.{{.Model}},
         <section id="idocs_template">
           <h2>Template</h2>
           <p>
-            Main former of this generator is The Template, if json file serve as directory and architecture builder, template is the code builder. Template is compiled when all meta, variable, and config in json and model file has been compiled.
+            Main former of this generator is The Template, if config file serve as directory and architecture builder, template is the code builder. Template is compiled when all meta, variable, and config in json and model file has been compiled.
             <p>
               Template will be compiled using default template from <a href="https://pkg.go.dev/text/template">Template Go</a>, so you can use directive, variable call, and all feature of The Golang Template.
             </p> 
